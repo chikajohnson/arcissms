@@ -10,9 +10,10 @@ class Result_model extends CI_MODEL
 		parent::__construct();
 		$this->table = 'results';
 	}
-	public function get_results()
+	public function get_results($index)
 	{
 		$this->db->select('r.* , c.code as code,  c.title as course, se.name as semester, session.name as session' );
+		$this->db->limit($index);		
 		$this->db->from('results as r');
 		$this->db->join('courses as c', 'r.course = c.id', 'left');
 		$this->db->join('semesters as se', 'r.semester = se.id', 'left');
@@ -95,10 +96,17 @@ class Result_model extends CI_MODEL
 		$this->db->where('id', $id);
 		$this->db->delete($this->table);
 	}
-	public function insertCSV($data)
+
+	public function insert_batch_CSV($data)
 	{
-		$this->db->insert('temp_results', $data);
+		$this->db->insert_batch('temp_results', $data);
 		return $this->db->insert_id();
+	}
+
+	public function add_batch($data)
+	{
+		$this->db->insert_batch('temp_results', $data);
+
 	}
 
 	public function get_last_inserted_results($batch_upload_code)

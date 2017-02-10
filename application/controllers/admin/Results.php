@@ -66,6 +66,7 @@ class Results extends CI_Controller {
 	            	$batch_upload_code = NULL;
 	            	$heading = True;
 	                $filename=$_FILES["file"]["tmp_name"];
+	                $csv_result_batch = array();
 	                if($_FILES["file"]["size"] > 0)
 	                  {
 	                    $file = fopen($filename, "r");
@@ -80,9 +81,9 @@ class Results extends CI_Controller {
 						        
 						    }
 						    						    	
-								 $batch_upload_code = $item;
+								$batch_upload_code = $item;
 
-							    $data = array(
+							    $batch_data = array(
 	                                'matric' => trim($emapData[0]),
 	                                'assessment' => trim($emapData[1]),
 	                                'exam_score' => trim($emapData[2]),
@@ -101,14 +102,17 @@ class Results extends CI_Controller {
 									'uploaded_in_batch' => True,
 	                               );
 
-	                               if ($this->student_model->matric_isvalid($data['matric']) == false) {
-	                                	$data['isvalid'] = 0;
-	                                } 
-	                                
+	                               // if ($this->student_model->matric_isvalid($batch_data['matric']) == false) {
+	                               //  	$batch_data['isvalid'] = 0;
+	                               //  } 
 	                                 
-	                           $insertId = $this->result_model->insertCSV($data); 	                     
+	                           array_push($csv_result_batch, $batch_data);
+	                           //$insertId = $this->result_model->insertCSV($data); 	                     
 	                 }
 	                fclose($file);
+	               
+	                $insertId = $this->result_model->insert_batch_CSV($csv_result_batch);
+
 	                $number = $this->result_model->count_last_inserted_tempresults($batch_upload_code);	       
 	                $msg = $number." results have been prepared for batch upload. Click <strong>FINISH UPLOAD</strong> to upload results or <strong>CANCEL UPLOAD </strong> to cancel the upload process.";
 
@@ -137,6 +141,7 @@ class Results extends CI_Controller {
 	{
 		$upload_count = 0;
 		$results = $this->result_model->get_last_inserted_tempresults($batch_upload_code);
+		$batch_result  = array();
 		if ($results) {
 			foreach ($results as $result) {
 				$data  = array(
@@ -160,12 +165,14 @@ class Results extends CI_Controller {
 				);
 				if ($data['isvalid'] == 1) {					
 					#$this->db->trans_start();
-					$this->result_model->add($data);
+					array_push($batch_result, $data);
 					$upload_count++;
-				}
-				
+				}				
 								
 			}
+
+				$this->result_model->add_batch($batch_result);
+			
 				$this->result_model->delete_last_inserted_tempresults($batch_upload_code);
 
 				$number = $this->result_model->count_last_inserted_results($batch_upload_code);	       
@@ -211,11 +218,14 @@ class Results extends CI_Controller {
 	public function index()
 	{
 			//Load template
-		$data['results'] = $this->result_model->get_results();
+
+		$data['index'] = '100';
+
+		$data['results'] = $this->result_model->get_results($data['index']);
 		$data['courses'] = $this->course_model->get_courses();
 		$data['count'] = $this->result_model->count();
 
-		$data['index'] = 'All';
+		
 
 		$data['main'] = "admin/results/index";
 		$this->load->view('admin/layout/main', $data);
