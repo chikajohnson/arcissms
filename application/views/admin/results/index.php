@@ -1,6 +1,9 @@
 <h4 style="margin:0 0 10px 0;"><span class="col-lg-offset-3 "><b>Student Examination Results</b></span></h4><br>
 <?php if($this->session->flashdata('success')): ?>
-<?php echo '<div class="alert alert-success alert-dismissable">'.$this->session->flashdata('success').'</div>'; ?>
+  <?php echo '<div class="alert alert-success alert-dismissable">'.$this->session->flashdata('success').'</div>'; ?>
+<?php endif;?>
+<?php if($this->session->flashdata('cancel_upload')): ?>
+  <?php echo '<div class="alert alert-warning alert-dismissable">'.$this->session->flashdata('cancel_upload').'</div>'; ?>
 <?php endif;?>
 <div>
   <?php echo validation_errors('<br><p class="alert alert-warning">'); ?>

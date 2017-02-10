@@ -204,7 +204,7 @@ class Results extends CI_Controller {
 		//Insert Activivty
 		$this->activity_model->add($activity);	  
 
-		$this->session->set_flashdata('warning', 'Batch upload process has been terminated');
+		$this->session->set_flashdata('cancel_upload', 'Batch upload process has been terminated');
 		redirect('admin/results','refresh');	
 	}
 
