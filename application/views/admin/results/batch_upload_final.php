@@ -6,11 +6,12 @@
 <?php if($this->session->flashdata('info')): ?>
 <?php echo '<div class="alert alert-success alert-dismissable">'.$this->session->flashdata('info').'</div>'; ?>
 <?php endif;?>
-
- <div id="loading">
+<div id="upload_div">
     <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+    <h3 class="text-danger">
       <span class="sr-only">Loading...</span>
-  </div>
+    </h3>
+  </div> 
 <div class="row">
   <div class="table-responsive">
     <span class="">
@@ -64,11 +65,16 @@
 
 <script type="text/javascript">
      
+      function validateInputs() {
+      $('#upload_div').show();  
+    }
+  
     
      function confirmUpload() {
       
       response = confirm("Are you sure you want to upload the results? Only valid results will be uploaded. ");
       if(response == true){
+        validateInputs()
         return true;
       }
       else if (response == false){       
@@ -76,6 +82,9 @@
       }
      
     }
+
+
+   
 
 
 

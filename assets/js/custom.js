@@ -1,4 +1,5 @@
 $(document).ready(function(){
+$('#upload_div').hide();
 $('#course-div').hide();
 
 $('#course-radio').click(function () {

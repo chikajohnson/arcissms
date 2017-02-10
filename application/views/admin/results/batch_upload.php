@@ -2,7 +2,7 @@
 	<h4><b>Upload Multiple Results</b></h4>
 	<div>
 		<?php echo validation_errors('<br><p class="alert alert-warning">'); ?>
-		<?php  echo $this->upload->display_errors('<p class="alert alert-danger">', '</p>');?>
+			<?php  echo $this->upload->display_errors('<p class="alert alert-danger">', '</p>');?>
 		</div>
 	</div>
 	<div class="row">
@@ -14,15 +14,19 @@
 			</ol>
 		</div>
 	</div>
+	<div id="upload_div">
+		<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+		<h3 class="text-danger">
+			<span class="sr-only">Loading...</span>
+		</h3>
+	</div>
+
 	<div class="row">
 		<?php echo form_open_multipart('admin/results/upload_result'); ?>
 		<div class="row form-group">
 			<div class="col-md-3">
 				<h5><strong>Choose a file To upload :</strong> </h5><input type="file" name="file" id="file" class="" >
 			</div>
-			<!-- <div class="col-md-6 pull-right">
-				<h5><strong>Enter unique batch upload number of 4 digits :</strong> </h5><input type="number" maxlength="4" name="batch_upload_code" id="batch_code" placeholder="Enter 4 digits number">
-			</div> -->
 		</div>
 		
 		<div class="form-group">
@@ -92,8 +96,15 @@
 	</div>
 	<div class="col-md-12">
 		<div class="btn-group pull-right">
-			<input type="submit" name="import" id="page_submit" value = "Upload results " class="btn btn-lg btn-primary">
+			<input type="submit" name="import" id="page_submit" value = "Upload results " onclick="validateInputs();" class="btn btn-lg btn-primary">
 			<a  href="<?php echo base_url(); ?>admin/results"  class="btn btn-lg btn-default">Close</a>
 		</div>
 	</div>
 	<?php echo form_close(); ?>
+
+	<script type="text/javascript">
+	  
+	  function validateInputs() {
+	    $('#upload_div').show();  
+	  }
+	</script>
