@@ -1,0 +1,46 @@
+/* body{
+	background: yellow !important;
+} */
+
+.btn{
+	margin: 0 3px;
+}
+
+li{
+	list-style: none;
+}
+#sidebar {
+  color: #fff;
+  background-color: #428bca;
+
+}
+.item{
+	background: lightgrey;
+	 color: #fff;
+	font-size: 17px;
+	font-style: italic;
+}
+
+.bg-1, .bg-2,.bg-3,.bg-4,.bg-5{
+	color: white !important;
+	font-size: 16px;
+}
+.bg-1{
+	background: green;
+}
+.bg-2{
+	background: blue;
+}
+.bg-3{
+	background: red;
+}
+.bg-4{
+	background: gray;
+}
+.bg-5{
+	background: orange;
+}
+
+/* .table{
+	margin-bottom: 1000px !important;
+} */
