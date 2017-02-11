@@ -76,7 +76,7 @@
 				</div>
 				<div class="col-sm-12 text-right">
 					<a href="<?php echo base_url(); ?>admin/results" title="Back to results" class="btn btn-lg btn-default glyphicon glyphicon-arrow-left pull-left"></a>
-					<a id="print" class="btn btn-lg btn-danger pull-right" onclick="hideButton(); printJS('print_html', 'html'); showButton();">Print as PDF</a>
+					<a id="print" class="btn btn-lg btn-danger pull-right" onclick="hideButton(); printJS('print_html', 'html'); showButton();">Export Result as PDF</a>
 				</div>
 				<?php else: ?>
 				<h3>

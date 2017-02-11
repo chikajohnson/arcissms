@@ -77,7 +77,7 @@
 						</ul>
 						<p class="text-right">
 							<a href="" title="Back to results" class="btn btn-lg btn-default glyphicon glyphicon-arrow-left pull-left"></a>
-							<a id="print" class="btn btn-lg btn-danger pull-right" onclick="hideButton(); printJS('print_html', 'html'); showButton();">Print as PDF</a>
+							<a id="print" class="btn btn-lg btn-danger pull-right" onclick="hideButton(); printJS('print_html', 'html'); showButton();">Export Result as PDF</a>
 						</p>
 					</p>
 				</div>
