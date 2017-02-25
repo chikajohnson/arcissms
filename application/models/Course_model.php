@@ -59,7 +59,7 @@ class Course_model extends CI_MODEL
 		$this->db->from($this->table);
 		$this->db->where('id', $id);
 		$query = $this->db->get();
-		return $query->row();
+		return $query->row()->code;
 	}
 
 	public function update($id, $data)

@@ -35,7 +35,6 @@ class Result_model extends CI_MODEL
 		$query = $this->db->get();
 		return $query->row();
 	}
-
 	public function search($table_column,$parameter)
 	{
 		
@@ -61,14 +60,10 @@ class Result_model extends CI_MODEL
 		
 		return $result;
 	}
-
 	public function count()
 	{
 		return $this->db->count_all($this->table);
 	}
-
-
-
 	public function check_if_id_exists($id)
 	{
 		$this->db->select('*');
@@ -78,7 +73,6 @@ class Result_model extends CI_MODEL
 		return $query->row(); 
 	}
 	
-
 	public function update($id, $data)
 	{
 			
@@ -96,19 +90,16 @@ class Result_model extends CI_MODEL
 		$this->db->where('id', $id);
 		$this->db->delete($this->table);
 	}
-
-	public function insert_batch_CSV($data)
+	public function temp_insert_batch_CSV($data)
 	{
+		
 		$this->db->insert_batch('temp_results', $data);
 		return $this->db->insert_id();
 	}
-
 	public function add_batch($data)
 	{
-		$this->db->insert_batch('temp_results', $data);
-
+		$this->db->insert_batch('results', $data);
 	}
-
 	public function get_last_inserted_results($batch_upload_code)
 	{
 		$this->db->select('r.* , c.code as code,  c.title as course, se.name as semester, session.name as session' );
@@ -120,7 +111,6 @@ class Result_model extends CI_MODEL
 		$query = $this->db->get();
 		return $query->result();
 	}
-
 	public function get_last_inserted_tempresults($batch_upload_code)
 	{
 		$this->db->select('*' );
@@ -129,7 +119,6 @@ class Result_model extends CI_MODEL
 		$query = $this->db->get();
 		return $query->result();
 	}
-
 	public function delete_last_inserted_tempresults($batch_upload_code)
 	{
 		$this->db->select('*' );
@@ -137,14 +126,12 @@ class Result_model extends CI_MODEL
 		$this->db->where('batch_upload_code', $batch_upload_code);
 		$this->db->delete('temp_results');
 	}
-
 	public function count_last_inserted_tempresults($batch_upload_code)
 	{
 		$this->db->count_all_results('temp_results');
 		$this->db->where('batch_upload_code', $batch_upload_code);
 		return $this->db->count_all_results('temp_results');
 	}
-
 	public function count_last_inserted_results($batch_upload_code)
 	{
 		$this->db->count_all_results('results');

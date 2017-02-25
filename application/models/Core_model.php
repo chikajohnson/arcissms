@@ -21,6 +21,7 @@ class Core_model extends CI_MODEL
 		if ($matric == $row->matric && $password == $row->password) {
 			return true;
 		} else {
+
 			return false;
 		}
 		
@@ -224,28 +225,7 @@ class Core_model extends CI_MODEL
 		
 	}
 
-	public function get_phonenumbers($session, $course)
-	{
-		// var_dump($course); die();
-		$numbers = array();
-
-		$this->db->select('s.phonenumber1 as phonenumber');
-		$this->db->from('students as s');
-		$this->db->join('results', 's.matric = results.matric', 'left');
-		$this->db->where('results.session', $session);
-		$this->db->where('results.course', $course);
-		//$this->db->distinct();
-
-		$query = $this->db->get()->result();
-		foreach ($query as $result) {
-			array_push($numbers, $result);
-		}
-		//var_dump($numbers); die();
-		return $numbers;
-	}
-
 	
-
 	public function send_message($phonenumber, $message)
 	{
 		return true;		
@@ -254,6 +234,25 @@ class Core_model extends CI_MODEL
 	public function get_helptext()
 	{
 		return 'Send text message using the format "HELP phonenumber matric password" to ';
+	}
+
+	public function get_phonenumbers($session, $course)
+	{
+		
+		$numbers = array();
+		$query = "SELECT DISTINCT students.phonenumber1 from students 	where students.matric in (	SELECT results.matric from results
+			    WHERE results.course = $course AND results.session = $session )";
+		$results = $this->db->query($query)->result();
+		foreach ($results as $number) {
+			array_push($numbers, $number->phonenumber1);
+		}
+		return $numbers;
+	}	
+	
+		
+	public function insert_sms($data)
+	{
+		$this->db->insert('sms', $data);
 	}
 		
 }

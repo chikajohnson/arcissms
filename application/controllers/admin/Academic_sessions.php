@@ -13,9 +13,7 @@ class Academic_sessions extends CI_Controller {
 
 		if ($this->session->userdata('user_type') != 'admin') {
 		 	redirect('welcome');
-		}
-
-				
+		}				
 	}
 	
 	public function index()
@@ -72,9 +70,7 @@ class Academic_sessions extends CI_Controller {
 	}
 
 	public function edit($id=0)
-	{
-
-		
+	{		
 		if ($this->academic_session_model->check_if_id_exists($id) == NULL) {
 			
 			$data['main'] = 'admin/error';
@@ -85,7 +81,6 @@ class Academic_sessions extends CI_Controller {
 			$this->form_validation->set_rules('description', 'description', 'trim|required');
 			$this->form_validation->set_rules('session_starts', 'session_starts', 'trim|required');
 			$this->form_validation->set_rules('session_ends', 'session_ends', 'trim|required');
-
 
 
 			if ($this->form_validation->run() == FALSE) {

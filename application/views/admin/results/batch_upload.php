@@ -3,7 +3,10 @@
 	<div>
 		<?php echo validation_errors('<br><p class="alert alert-warning">'); ?>
 			<?php  echo $this->upload->display_errors('<p class="alert alert-danger">', '</p>');?>
-		</div>
+	</div>
+	<?php if($this->session->flashdata('excel')): ?>
+ 	 <?php echo '<div class="alert alert-warning alert-dismissable">'.$this->session->flashdata('excel').'</div>'; ?>
+	<?php endif;?>
 	</div>
 	<div class="row">
 		<div class="col-lg-12">

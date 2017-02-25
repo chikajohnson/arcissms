@@ -1,9 +1,12 @@
 <div class="row">
-	<h34<b>Send message</b><small><a href="<?php echo base_url(); ?>admin/messages" title="back to messages" class="btn btn-md btn-default pull-right">Back</a></small></h4>
+	<h4><b>Send message</b><small><a href="<?php echo base_url(); ?>admin/messages" title="back to messages" class="btn btn-md btn-default pull-right">Back</a></small></h4>
 	<div>
 		<?php echo validation_errors('<br><p class="alert alert-warning">'); ?>
 		</div>
 	</div>
+	<?php if($this->session->flashdata('error')): ?>
+	<?php echo '<div class="alert alert-warning alert-dismissable">'.$this->session->flashdata('error').'</div>'; ?>
+	<?php endif;?>
 		
 	<form method="post"  action="<?php echo base_url() ?>admin/messages/send/<?php echo $message->id; ?>">
 		<div class="form-group">	
@@ -67,5 +70,3 @@
 			
 		</div>
 	</form>	
-
-	

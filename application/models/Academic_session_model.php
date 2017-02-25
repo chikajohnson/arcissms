@@ -25,6 +25,15 @@ class Academic_session_model extends CI_MODEL
 		$query = $this->db->get();
 		return $query->row();
 	}
+
+	public function get_session_name($id)
+	{
+		$this->db->select('name');
+		$this->db->from($this->table);
+		$this->db->where('id', $id);
+		$query = $this->db->get();
+		return $query->row()->name;
+	}
 	public function search($table_column,$parameter)
 	{
 		

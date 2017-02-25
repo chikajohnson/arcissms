@@ -103,4 +103,8 @@ $route['admin/courses/search/(:any)'] = 'admin/courses/index/$1';
 $route['admin/courses/paginate/(:any)'] = 'admin/courses/index';
 
 
+$route['admin/courses/paginate/(:any)'] = 'admin/courses/index';
+$route['sms/(:any)'] = 'SMS';
+
+
 

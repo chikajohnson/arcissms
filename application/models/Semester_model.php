@@ -25,6 +25,17 @@ class Semester_model extends CI_MODEL
 		$query = $this->db->get();
 		return $query->row();
 	}
+
+	public function get_semester_name($id)
+	{		
+		$this->db->select('name');
+		$this->db->from($this->table);
+		$this->db->where('id', $id);
+		$query = $this->db->get();
+		return $query->row()->name;
+	}
+
+
 	public function update($id, $data)
 	{
 			

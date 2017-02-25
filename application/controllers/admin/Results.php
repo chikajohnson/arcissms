@@ -1,3 +1,4 @@
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Results extends CI_Controller {
@@ -8,24 +9,18 @@ class Results extends CI_Controller {
 		if (!$this->session->userdata('logged_in')) {
 		 	redirect('welcome');
 		}
-
 		if ($this->session->userdata('user_type') != 'admin') {
 		 	redirect('welcome');
 		}
-
-		// var_dump(date('d-m-Y:H:i:s')); die();
-		// var_dump($this->student_model->matric_isvalid('189921')) ; die();
 		
 	}
 			
-
 	public	function upload_result()	
 	{
 		$data['courses'] = $this->course_model->get_courses();
 		$data['semesters'] = $this->semester_model->get_semesters();
 		$data['sessions'] = $this->academic_session_model->get_academic_sessions();
-
-		$config['upload_path'] = "";
+		$config['upload_path'] =  APPPATH . 'uploads/';
 		$config['allowed_types'] = 'xlsx|xls|csv';
 		$config['max_size']  = '0';
 		$config['max_width']  = '1024';
@@ -34,14 +29,10 @@ class Results extends CI_Controller {
 		
 		$this->form_validation->set_rules('course_lecturer1', 'Course lecturer1', 'trim|required');
 		$this->form_validation->set_rules('chief_examiner', 'Chief examiner', 'trim|required');
-
 		$this->form_validation->set_rules('semester', 'Semester',  'trim|required|greater_than[0]');
 		$this->form_validation->set_rules('session', 'Academic session',  'trim|required|greater_than[0]');
 		$this->form_validation->set_rules('course', 'Course',  'trim|required|greater_than[0]');
-
 		$this->form_validation->set_message('greater_than', 'Please select %s.');
-
-
 		#var_dump('reacheable'); die();
 		if ($this->form_validation->run() == FALSE) {
 			$data['main'] = "admin/results/batch_upload";
@@ -49,20 +40,16 @@ class Results extends CI_Controller {
 		}
 		elseif (!$this->upload->do_upload('file')){
 			$error = array('error' => $this->upload->display_errors());
-
 			$data['main'] = "admin/results/batch_upload";
-			$this->load->view('admin/layout/main', $data);			
+			$this->load->view('admin/layout/main', $data);		
 		}
 		else
 		{
-
-
 			if(isset($_POST["import"]))
 	            {
 	            	$current_date = date('d-m-Y:H:i:s');
 					$item = $this->course_model->get_course_code($this->input->post('course'));
-			    	$item = strtolower($item->code) . "-" . $current_date;
-
+			    	$item = strtolower($item) . "-" . $current_date;
 	            	$batch_upload_code = NULL;
 	            	$heading = True;
 	                $filename=$_FILES["file"]["tmp_name"];
@@ -70,10 +57,17 @@ class Results extends CI_Controller {
 	                if($_FILES["file"]["size"] > 0)
 	                  {
 	                    $file = fopen($filename, "r");
-
+	                    // Check if the Excel/CSV file is in a right format
+	                    if(($emapData = fgetcsv($file, 10000, ",")) !== FALSE){
+	                    	if(trim($emapData[0][0]) != 'matric' && trim($emapData[1]) != 'assessment' && trim($emapData[0][2]) != 'exam_score' && 
+                     	 		trim($emapData[0][3]) != 'total_score'){
+                     	 		$this->session->set_flashdata('excel', "Excel you are trying to upload file is not in the correct format.");    redirect('admin/results/upload_result');
+                     	 	}
+	                    }
+                     	 	
 	                     while (($emapData = fgetcsv($file, 10000, ",")) !== FALSE)
 	                     {
-	                     	 if($heading) {
+	                     	 if($heading) {	                                 
 						        // unset the heading flag
 						        $heading = false;
 						        // skip the loop
@@ -82,9 +76,8 @@ class Results extends CI_Controller {
 						    }
 						    						    	
 								$batch_upload_code = $item;
-
 							    $batch_data = array(
-	                                'matric' => trim($emapData[0]),
+	                                 'matric' => trim($emapData[0]),
 	                                'assessment' => trim($emapData[1]),
 	                                'exam_score' => trim($emapData[2]),
 	                                'total_score' => trim($emapData[3]),
@@ -100,22 +93,29 @@ class Results extends CI_Controller {
 									'chief_examiner' => $this->input->post('chief_examiner'),
 									'batch_upload_code'	 => $item,
 									'uploaded_in_batch' => True,
-	                               );
 
-	                               // if ($this->student_model->matric_isvalid($batch_data['matric']) == false) {
-	                               //  	$batch_data['isvalid'] = 0;
-	                               //  } 
-	                                 
+									'course_code' => $this->course_model->get_course_code($this->input->post('course')),
+									'semester_name' => $this->semester_model->get_semester_name($this->input->post('semester')),
+									'session_name' => $this->academic_session_model->get_session_name($this->input->post('session'))
+	                               );
+	                               
+
+	                               if ($this->student_model->matric_isvalid($batch_data['matric']) == false) {
+	                                	$batch_data['isvalid'] = 0;
+	                                }
+	                                else{
+	                                	$batch_data['isvalid'] = 1;
+	                                } 
+	                            
 	                           array_push($csv_result_batch, $batch_data);
-	                           //$insertId = $this->result_model->insertCSV($data); 	                     
+	                          // $insertId = $this->result_model->insertCSV($data); 	                     
 	                 }
 	                fclose($file);
-	               
-	                $insertId = $this->result_model->insert_batch_CSV($csv_result_batch);
-
+	                	               
+	                $insertId = $this->result_model->temp_insert_batch_CSV($csv_result_batch);
+	                
 	                $number = $this->result_model->count_last_inserted_tempresults($batch_upload_code);	       
 	                $msg = $number." results have been prepared for batch upload. Click <strong>FINISH UPLOAD</strong> to upload results or <strong>CANCEL UPLOAD </strong> to cancel the upload process.";
-
 	                // Insert users activity
 	                $activity  = array(
 						'resource_id' => $batch_upload_code,
@@ -126,7 +126,6 @@ class Results extends CI_Controller {
 					);
 					//Insert Activivty
 					$this->activity_model->add($activity);	                 
-
 	                $this->session->set_flashdata('info', $msg);
 	                $data['results'] = $this->result_model->get_last_inserted_results($batch_upload_code);
 	              	
@@ -145,7 +144,7 @@ class Results extends CI_Controller {
 		if ($results) {
 			foreach ($results as $result) {
 				$data  = array(
-					'matric' 			=>  $result->matric,
+					'matric' 			=> $result->matric,
                     'assessment'	 	=> $result->assessment,
                     'exam_score'	 	=> $result->exam_score,
                     'total_score'	 	=> $result->total_score,
@@ -161,23 +160,22 @@ class Results extends CI_Controller {
 					'chief_examiner'    => $result->chief_examiner,
 					'batch_upload_code' => $result->batch_upload_code,
 					'uploaded_in_batch' => $result->uploaded_in_batch,
-					'isvalid'			=>$result->isvalid
+					'isvalid'			=>$result->isvalid,
+
+					'course_code' => $this->course_model->get_course_code($result->course),
+					'semester_name' => $this->semester_model->get_semester_name($result->semester),
+					'session_name' => $this->academic_session_model->get_session_name($result->session)					
 				);
-				if ($data['isvalid'] == 1) {					
-					#$this->db->trans_start();
+				
+				if ($data['isvalid'] == 1) {
 					array_push($batch_result, $data);
 					$upload_count++;
 				}				
 								
 			}
-
 				$this->result_model->add_batch($batch_result);
-			
-				$this->result_model->delete_last_inserted_tempresults($batch_upload_code);
-
 				$number = $this->result_model->count_last_inserted_results($batch_upload_code);	       
 	            $msg = $upload_count." Result have been succesfully inserted into the results table.";
-
 	            // Insert users activity
 	                $activity  = array(
 						'resource_id' => $batch_upload_code,
@@ -188,9 +186,9 @@ class Results extends CI_Controller {
 					);
 					//Insert Activivty
 					
-
-					$this->activity_model->add($activity);	  
-
+					$this->activity_model->add($activity);	
+			
+				$this->result_model->delete_last_inserted_tempresults($batch_upload_code);  
 	            $this->session->set_flashdata('success', $msg);   
 				redirect('admin/results','refresh');
 		}
@@ -199,7 +197,6 @@ class Results extends CI_Controller {
 	public function cancel_batch_upload($batch_upload_code)
 	{   
 		$this->result_model->delete_last_inserted_tempresults($batch_upload_code);	
-
 		// Insert users activity
         $activity  = array(
 			'resource_id' => $batch_upload_code,
@@ -210,23 +207,17 @@ class Results extends CI_Controller {
 		);
 		//Insert Activivty
 		$this->activity_model->add($activity);	  
-
 		$this->session->set_flashdata('cancel_upload', 'Batch upload process has been terminated');
 		redirect('admin/results','refresh');	
 	}
-
 	public function index()
 	{
 			//Load template
-
 		$data['index'] = '100';
-
 		$data['results'] = $this->result_model->get_results($data['index']);
 		$data['courses'] = $this->course_model->get_courses();
 		$data['count'] = $this->result_model->count();
-
 		
-
 		$data['main'] = "admin/results/index";
 		$this->load->view('admin/layout/main', $data);
 	}
@@ -253,11 +244,14 @@ class Results extends CI_Controller {
 			$data  = array(
 				'matric' => $this->input->post('matric'),
 				'course' => $this->input->post('course'),
-					'semester'	 => $this->input->post('semester'),
+				'course_code' => $this->course_model->get_course_code($this->input->post('course')),
+				'semester'	 => $this->input->post('semester'),
+				'semester_name' => $this->semester_model->get_semester_name($this->input->post('semester')),
 				'assessment' => $this->input->post('assessment'),
 				'exam_score' => $this->input->post('exam_score'),
 				'adjusted_mark' => $this->input->post('adjusted_mark'),
 				'session' => $this->input->post('session'),
+				'session_name' => $this->academic_session_model->get_session_name($this->input->post('session')),
 				'remark' => $this->input->post('remark'),
 				'course_lecturer1' => $this->input->post('course_lecturer1'),
 				'course_lecturer2' => $this->input->post('course_lecturer2'),
@@ -265,6 +259,7 @@ class Results extends CI_Controller {
 				'course_lecturer4' => $this->input->post('course_lecturer4'),
 				'chief_examiner' => $this->input->post('chief_examiner')
 				);
+
 			//insert results
 			$this->result_model->add($data);
 			$result = $this->course_model->get_course($this->input->post('course'));
@@ -314,11 +309,14 @@ class Results extends CI_Controller {
 				$data  = array(
 					'matric' => $this->input->post('matric'),
 					'course' => $this->input->post('course'),
+					'course_code' => $this->course_model->get_course_code($this->input->post('course')),
 					'semester'	 => $this->input->post('semester'),
+					'semester_name' => $this->semester_model->get_semester_name($this->input->post('semester')),
 					'assessment' => $this->input->post('assessment'),
 					'exam_score' => $this->input->post('exam_score'),
 					'adjusted_mark' => $this->input->post('adjusted_mark'),
 					'session' => $this->input->post('session'),
+					'session_name' => $this->academic_session_model->get_session_name($this->input->post('session')),
 					'remark' => $this->input->post('remark'),
 					'course_lecturer1' => $this->input->post('course_lecturer1'),
 					'course_lecturer2' => $this->input->post('course_lecturer2'),
@@ -326,6 +324,7 @@ class Results extends CI_Controller {
 					'course_lecturer4' => $this->input->post('course_lecturer4'),
 					'chief_examiner' => $this->input->post('chief_examiner')
 					);
+
 				//update result
 				$this->result_model->update($id, $data);
 				$data  = array(
@@ -351,12 +350,10 @@ class Results extends CI_Controller {
 		} else {
 			//Load template
 			$data['result'] = $this->result_model->get_result($id);
-
 			$data['main'] = "admin/results/detail";
 			$this->load->view('admin/layout/main', $data);
 		}
 	}
-
 	public function delete($id = 0)
 	{
 		if ($this->result_model->check_if_id_exists($id) == NULL) {
@@ -379,7 +376,6 @@ class Results extends CI_Controller {
 				redirect('admin/results','refresh');
 		}
 	}
-
 	public function search()
 	{
 		if (!isset($_POST['result'])){
@@ -388,11 +384,8 @@ class Results extends CI_Controller {
 		
 		$data['results'] = null;
 		$data['index'] = "All";
-
 		$this->form_validation->set_rules('result', 'result', 'trim|required|differs[0]');
-
 		// $this->form_validation->set_rules('search_param', 'Search parameter', 'trim|required');
-
 		if ($this->form_validation->run() == FALSE) {
 			// var_dump($data); die();
 			$data['main'] = "admin/results/index";
@@ -404,29 +397,22 @@ class Results extends CI_Controller {
 				 );
 			
 			$data['count'] = $this->result_model->count();
-
 			//insert result
 			$data['index'] = "All";
 			$data['results'] = $this->result_model->search($data['result'], $data['search_param']);
 			$data['main'] = "admin/results/index";
 			$this->load->view('admin/layout/main', $data);
-
 			
 		}
 		
 	}
-
 	public function paginate()
 	{
 		if(isset($_POST['result'])){
 		
-
 			$this->form_validation->set_rules('result', 'result', 'trim|required');
-
 			$data['index'] = "All";
 			// $this->form_validation->set_rules('search_param', 'Search parameter', 'trim|required');
-
-
 			if ($this->form_validation->run() == FALSE) {
 				$data['main'] = "admin/results/index";
 				$this->load->view('admin/layout/main', $data);
@@ -438,18 +424,13 @@ class Results extends CI_Controller {
 				$data['count'] = $this->result_model->count();	
 				$data['index'] = $data['result'];
 				$data['results'] = $this->result_model->paginate($data['result']);
-
 				$data['main'] = "admin/results/index";
 				$this->load->view('admin/layout/main', $data);
-
 				
 			}
-
 		} else {
 			redirect('admin/results/index','refresh');
 		}
 	}
-
-
 		
 }

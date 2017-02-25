@@ -2,6 +2,10 @@
 <?php if($this->session->flashdata('success')): ?>
 <?php echo '<div class="alert alert-success alert-dismissable">'.$this->session->flashdata('success').'</div>'; ?>
 <?php endif;?>
+
+<?php if($this->session->flashdata('err_response')): ?>
+<?php echo '<div class="alert alert-danger alert-dismissable">'.$this->session->flashdata('err_response').'</div>'; ?>
+<?php endif;?>
 <div>
   <?php echo validation_errors('<br><p class="alert alert-warning">'); ?>
   </div>
