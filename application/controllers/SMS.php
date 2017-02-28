@@ -9,17 +9,24 @@ class SMS extends CI_Controller {
 	
 	public function index()
 	{
-		// $request = array_merge($_GET, $_POST);
-		// if (!isset($request['results'])) {
-			// 	$item = "No request recieved";
-		// } else {
-			// 	$item = $request['results'];
-		// }
+
+		//recieve request forwarded from infobiP sms gateway 
+		$request = array_merge($_GET, $_POST);
+		if (!isset($request['results'])) {
+				$item = "No request recieved";
+		} else {
+				$item = $request['results'];
+		}
 		
-		// $data_item  = array('text' => $item);
-		// $this->core_model->insert_sms($data_item);
-		// echo "It is working ";
+
+		//am using this to test if any sms request is forwarded to my controller when a user sends sms to my virtual number
+		$data_item  = array('text' => $item);
+		$this->core_model->insert_sms($data_item);
+		echo "It is working ";
 		$url = "help";
+
+
+
 		$this->process_sms_request($url);
 	}
 	public function process_sms_request($url_request)
@@ -31,8 +38,7 @@ class SMS extends CI_Controller {
 		//var_dump($input_array); die();
 		switch (strtolower(trim($keyword))){
 			case 'result':
-				if (count($input_array) == 5) {
-					
+				if (count($input_array) == 5) {					
 					$matric = trim($input_array[1]);
 					$password = trim($input_array[2]);
 					$semester = strtolower(trim($input_array[3]));
@@ -41,7 +47,7 @@ class SMS extends CI_Controller {
 					if($this->confirm_password($matric, $password) == true && $this->matric_exist($matric)){
 						$all_results = $this->check_all_results($matric, $semester, $session);
 						$this->send_message($phonenumber, $all_results);
-												return true;
+						return true;
 					}
 					else{
 						$error_messaage = "An error has occured. Check message format/content and send again.";
@@ -55,7 +61,7 @@ class SMS extends CI_Controller {
 					if($this->confirm_password($matric, $password) == true && $this->matric_exist($matric) && $this->course_exist($course_code)){
 						$single_result = $this->check_single_result($matric, $course_code);
 							$this->send_message($phonenumber, $single_result);
-											return true;
+						return true;
 					}
 					else{
 						$error_messaage = "An error has occured. Check message format/content and send again.";
